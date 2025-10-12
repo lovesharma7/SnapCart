@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - E-Commerce Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h2>ShopHub</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/virtual-basket">Virtual Basket</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="/login" class="active">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="auth-page">
+        <div class="container">
+            <div class="auth-container">
+                <div id="login-form" class="auth-form">
+                    <h2>Login</h2>
+                    <input type="text" id="login-username" placeholder="Username" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button id="login-btn" class="btn btn-primary">Login</button>
+                    <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
+                    <div id="login-message" class="message"></div>
+                </div>
+
+                <div id="register-form" class="auth-form" style="display: none;">
+                    <h2>Register</h2>
+                    <input type="text" id="register-username" placeholder="Username" required>
+                    <input type="email" id="register-email" placeholder="Email" required>
+                    <input type="password" id="register-password" placeholder="Password" required>
+                    <button id="register-btn" class="btn btn-primary">Register</button>
+                    <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+                    <div id="register-message" class="message"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>
