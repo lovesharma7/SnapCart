@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SnapCart{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Welcome to SnapCart</h1>
+            <p>Discover amazing products and create your perfect outfit with our Virtual Basket feature</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('products') }}" class="btn btn--primary btn--lg">Shop Now</a>
+                <a href="{{ url_for('virtual_basket') }}" class="btn btn--outline btn--lg">Try Virtual Basket</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{{ url_for('products', category=category.id) }}" class="category-card">
+                <div class="category-icon">
+                    {% if category.name == 'Clothing' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                        </svg>
+                    {% elif category.name == 'Footwear' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 17v3c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-3M8 17H2M20 12v8c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1v-8"/>
+                            <path d="M14 12h6M3.5 12c0-3.5 2-6 4.5-6 1.5 0 3 1 4 2.5 1-1.5 2.5-2.5 4-2.5 2.5 0 4.5 2.5 4.5 6"/>
+                        </svg>
+                    {% elif category.name == 'Electronics' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    {% endif %}
+                </div>
+                <h3>{{ category.name }}</h3>
+                <p>{{ category.description }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-section">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <div class="product-card">
+                <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                    <div class="product-image">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">{{ product.category_name }}</span>
+                        <h3 class="product-name">{{ product.name }}</h3>
+                        <p class="product-price">₹{{ "%.2f"|format(product.price) }}</p>
+                        {% if product.stock > 0 %}
+                            <span class="status status--success">In Stock</span>
+                        {% else %}
+                            <span class="status status--error">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% if is_logged_in and product.stock > 0 %}
+                <button class="btn btn--primary btn--full-width add-to-cart-btn" 
+                        data-product-id="{{ product.id }}">
+                    Add to Cart
+                </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center" style="margin-top: 2rem;">
+            <a href="{{ url_for('products') }}" class="btn btn--outline">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Virtual Basket Feature Highlight -->
+<section class="feature-highlight">
+    <div class="container">
+        <div class="feature-content">
+            <div class="feature-text">
+                <h2>Introducing Virtual Basket</h2>
+                <p>Our unique feature that helps you create perfect outfit combinations! Simply type what you're looking for, and we'll suggest matching items.</p>
+                <p><strong>Example:</strong> "1 white shirt, 1 black pant, 1 pair of sneakers"</p>
+                <a href="{{ url_for('virtual_basket') }}" class="btn btn--primary">Try It Now</a>
+            </div>
+            <div class="feature-visual">
+                <div class="feature-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <p>AI-Powered Suggestions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}

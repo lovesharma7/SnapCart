@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Login / Signup - SnapCart{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="signup">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div class="auth-form-container" id="login-form" style="display: block;">
+                <h2>Welcome Back</h2>
+                <p class="auth-subtitle">Login to continue shopping</p>
+                
+                <form id="login-form-element">
+                    <div class="form-group">
+                        <label for="login-username" class="form-label">Username or Email</label>
+                        <input type="text" 
+                               id="login-username" 
+                               class="form-control" 
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" 
+                               id="login-password" 
+                               class="form-control" 
+                               required>
+                    </div>
+                    
+                    <div id="login-error" class="error-message" style="display: none;"></div>
+                    
+                    <button type="submit" class="btn btn--primary btn--lg btn--full-width">
+                        Login
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Signup Form -->
+            <div class="auth-form-container" id="signup-form" style="display: none;">
+                <h2>Create Account</h2>
+                <p class="auth-subtitle">Join us and start shopping</p>
+                
+                <form id="signup-form-element">
+                    <div class="form-group">
+                        <label for="signup-username" class="form-label">Username</label>
+                        <input type="text" 
+                               id="signup-username" 
+                               class="form-control" 
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email" class="form-label">Email</label>
+                        <input type="email" 
+                               id="signup-email" 
+                               class="form-control" 
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password" class="form-label">Password</label>
+                        <input type="password" 
+                               id="signup-password" 
+                               class="form-control" 
+                               minlength="6"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" 
+                               id="signup-confirm-password" 
+                               class="form-control" 
+                               minlength="6"
+                               required>
+                    </div>
+                    
+                    <div id="signup-error" class="error-message" style="display: none;"></div>
+                    
+                    <button type="submit" class="btn btn--primary btn--lg btn--full-width">
+                        Sign Up
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Tab switching
+document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        
+        // Update active tab
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Show corresponding form
+        document.getElementById('login-form').style.display = tabName === 'login' ? 'block' : 'none';
+        document.getElementById('signup-form').style.display = tabName === 'signup' ? 'block' : 'none';
+    });
+});
+
+// Login form submission
+document.getElementById('login-form-element').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            document.getElementById('login-error').textContent = data.error;
+            document.getElementById('login-error').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        document.getElementById('login-error').textContent = 'An error occurred';
+        document.getElementById('login-error').style.display = 'block';
+    });
+});
+
+// Signup form submission
+document.getElementById('signup-form-element').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('signup-username').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+        document.getElementById('signup-error').textContent = 'Passwords do not match';
+        document.getElementById('signup-error').style.display = 'block';
+        return;
+    }
+    
+    fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            document.getElementById('signup-error').textContent = data.error;
+            document.getElementById('signup-error').style.display = 'block';
+        }
+    })
+    .catch(error => {
+        document.getElementById('signup-error').textContent = 'An error occurred';
+        document.getElementById('signup-error').style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

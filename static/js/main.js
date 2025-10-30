@@ -1,153 +1,104 @@
-// API Base URL
-const API_URL = 'http://127.0.0.1:5000/api';
+// Main JavaScript file for common functionality
 
-// Check user session on page load
-document.addEventListener('DOMContentLoaded', async () => {
-    await checkSession();
-    loadCategories();
-    loadFeaturedProducts();
+// Update cart badge count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartBadge();
+    
+    // Add click handlers for example chips in virtual basket
+    document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            const basketInput = document.getElementById('basket-input');
+            if (basketInput) {
+                basketInput.value = this.textContent.trim();
+            }
+        });
+    });
 });
 
-// Check if user is logged in
-async function checkSession() {
-    try {
-        const response = await fetch(`${API_URL}/check-session`);
-        const data = await response.json();
-        
-        const authLink = document.getElementById('auth-link');
-        if (data.logged_in) {
-            authLink.textContent = `Logout (${data.username})`;
-            authLink.onclick = logout;
-            authLink.href = '#';
-        } else {
-            authLink.textContent = 'Login';
-            authLink.href = '/login';
-        }
-    } catch (error) {
-        console.error('Session check error:', error);
-    }
+// Function to update cart badge
+function updateCartBadge() {
+    fetch('/api/cart/count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = data.count || 0;
+                if (data.count > 0) {
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        })
+        .catch(error => console.error('Error updating cart badge:', error));
 }
 
-// Logout function
-async function logout(e) {
-    e.preventDefault();
-    try {
-        const response = await fetch(`${API_URL}/logout`, {
-            method: 'POST'
-        });
-        
-        if (response.ok) {
-            window.location.href = '/login';
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-}
-
-// Load categories
-async function loadCategories() {
-    const categoriesGrid = document.getElementById('categories-grid');
-    if (!categoriesGrid) return;
-    
-    try {
-        const response = await fetch(`${API_URL}/categories`);
-        const categories = await response.json();
-        
-        categoriesGrid.innerHTML = categories.map(category => `
-            <div class="category-card" onclick="filterByCategory(${category.category_id})">
-                <h3>${category.category_name}</h3>
-                <p>${category.description}</p>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading categories:', error);
-    }
-}
-
-// Load featured products (first 8 products)
-async function loadFeaturedProducts() {
-    const featuredProducts = document.getElementById('featured-products');
-    if (!featuredProducts) return;
-    
-    try {
-        const response = await fetch(`${API_URL}/products`);
-        const products = await response.json();
-        
-        featuredProducts.innerHTML = products.slice(0, 8).map(product => createProductCard(product)).join('');
-    } catch (error) {
-        console.error('Error loading products:', error);
-    }
-}
-
-// Create product card HTML
-function createProductCard(product) {
-    return `
-        <div class="product-card">
-            <div class="product-image">
-                ${product.image_url ? `<img src="${product.image_url}" alt="${product.product_name}" style="width:100%; height:100%; object-fit:cover;">` : 'Image Placeholder'}
-            </div>
-            <div class="product-info">
-                <h3>${product.product_name}</h3>
-                <p class="product-details">
-                    ${product.color ? `Color: ${product.color}` : ''} 
-                    ${product.size ? `| Size: ${product.size}` : ''}
-                </p>
-                <p class="product-price">$${product.price}</p>
-                <button class="btn btn-primary" onclick="addToCart(${product.product_id})">Add to Cart</button>
-            </div>
-        </div>
+// Show notification
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert--${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 16px;
+        z-index: 1001;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
     `;
-}
-
-// Add to cart
-async function addToCart(productId) {
-    try {
-        const response = await fetch(`${API_URL}/cart/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                product_id: productId,
-                quantity: 1
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            alert('Product added to cart!');
-            updateCartCount();
-        } else {
-            alert(data.error || 'Please login to add items to cart');
-            window.location.href = '/login';
-        }
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        alert('Please login to add items to cart');
-    }
-}
-
-// Update cart count
-async function updateCartCount() {
-    try {
-        const response = await fetch(`${API_URL}/cart`);
-        if (response.ok) {
-            const cartItems = await response.json();
-            const cartCount = document.getElementById('cart-count');
-            if (cartCount) {
-                cartCount.textContent = cartItems.length;
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
-    } catch (error) {
-        console.error('Error updating cart count:', error);
-    }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }
 
-// Filter by category (redirect to products page)
-function filterByCategory(categoryId) {
-    window.location.href = `/products?category=${categoryId}`;
+// Format price in Indian Rupees
+function formatPrice(price) {
+    return '₹' + parseFloat(price).toFixed(2);
 }
 
-// Initialize cart count on load
-updateCartCount();
+// Debounce function for search inputs
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}

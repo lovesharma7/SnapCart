@@ -1,71 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Basket - E-Commerce Store</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h2>ShopHub</h2>
-            </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/products">Products</a></li>
-                <li><a href="/virtual-basket" class="active">Virtual Basket</a></li>
-                <li><a href="/cart">Cart <span id="cart-count" class="badge">0</span></a></li>
-                <li><a href="/login" id="auth-link">Login</a></li>
-            </ul>
+{% extends "base.html" %}
+
+{% block title %}Virtual Basket - SnapCart{% endblock %}
+
+{% block content %}
+<section class="virtual-basket-page">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Virtual Basket</h1>
+            <p class="page-subtitle">Describe what you're looking for, and we'll suggest the perfect combinations!</p>
         </div>
-    </nav>
-
-    <section class="virtual-basket-page">
-        <div class="container">
-            <h1>Virtual Basket - AI Outfit Recommendations</h1>
-            <p class="subtitle">Tell us what you need, and we'll suggest perfect combinations!</p>
-
-            <div class="basket-input-section">
-                <h3>Add Items to Your Virtual Basket</h3>
-                <div id="items-list">
-                    <!-- Items will be added here -->
-                </div>
-                
-                <div class="add-item-form">
-                    <input type="text" id="item-description" placeholder="e.g., black shirt">
-                    <select id="item-category">
-                        <option value="">Select Category</option>
-                    </select>
-                    <input type="text" id="item-color" placeholder="Color (optional)">
-                    <button id="add-item-btn" class="btn btn-secondary">Add Item</button>
-                </div>
-
-                <button id="get-recommendations-btn" class="btn btn-primary">Get Recommendations</button>
-            </div>
-
-            <div id="recommendations-section" class="recommendations-section" style="display: none;">
-                <h2>Recommended Combinations for You</h2>
-                <div id="combinations-container" class="combinations-grid">
-                    <!-- Combinations will be loaded here -->
-                </div>
-
-                <h3>Individual Product Matches</h3>
-                <div id="recommendations-container" class="products-grid">
-                    <!-- Individual recommendations will be loaded here -->
+        
+        <!-- Input Section -->
+        <div class="virtual-basket-input-section">
+            <div class="card">
+                <div class="card__body">
+                    <label for="basket-input" class="form-label">What would you like to wear today?</label>
+                    <textarea id="basket-input" 
+                              class="form-control" 
+                              rows="4" 
+                              placeholder="Example: 1 white shirt, 1 black pant, 1 pair of white sneakers"></textarea>
+                    
+                    <div class="example-chips">
+                        <span class="chip">1 white shirt, 1 black pant, 1 pair of sneakers</span>
+                        <span class="chip">1 blue jeans, 1 black leather jacket</span>
+                        <span class="chip">1 formal shirt, 1 brown belt, 1 pair of formal shoes</span>
+                    </div>
+                    
+                    <button id="parse-basket-btn" class="btn btn--primary btn--lg btn--full-width">
+                        Find My Outfit
+                    </button>
                 </div>
             </div>
         </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 ShopHub. All rights reserved.</p>
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-state" style="display: none;">
+            <div class="spinner"></div>
+            <p>Finding perfect combinations for you...</p>
         </div>
-    </footer>
+        
+        <!-- Results Section -->
+        <div id="results-section" style="display: none;">
+            <!-- Parsed Items -->
+            <div class="results-subsection">
+                <h2 class="section-title">Items You're Looking For</h2>
+                <div id="parsed-items" class="parsed-items-grid"></div>
+            </div>
+            
+            <!-- Suggested Combos -->
+            <div class="results-subsection">
+                <h2 class="section-title">Suggested Outfit Combinations</h2>
+                <div id="suggested-combos"></div>
+            </div>
+            
+            <!-- Individual Suggestions -->
+            <div class="results-subsection">
+                <h2 class="section-title">Product Suggestions</h2>
+                <div id="product-suggestions"></div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <h3>Start Creating Your Perfect Outfit</h3>
+            <p>Type what you're looking for in the box above, and we'll help you find matching items!</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/virtual_basket.js') }}"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/virtual_basket.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+{% endblock %}
