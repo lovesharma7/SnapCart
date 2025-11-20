@@ -4,168 +4,165 @@
 
 {% block content %}
 <section class="cart-page">
-    <div class="container">
-        <h1 class="page-title">Shopping Cart</h1>
-        
-        {% if cart_items %}
-        <div class="cart-layout">
-            <!-- Cart Items -->
-            <div class="cart-items-section">
-                {% for item in cart_items %}
-                <div class="cart-item" data-product-id="{{ item.product_id }}">
-                    <div class="cart-item-image">
-                        <img src="{{ item.image_url }}" alt="{{ item.name }}">
-                    </div>
-                    
-                    <div class="cart-item-details">
-                        <h3 class="cart-item-name">{{ item.name }}</h3>
-                        <p class="cart-item-price">₹{{ "%.2f"|format(item.price) }} each</p>
-                        
-                        <div class="cart-item-actions">
-                            <div class="quantity-controls">
-                                <button class="qty-btn qty-decrease" data-product-id="{{ item.product_id }}">−</button>
-                                <input type="number" 
-                                       class="qty-input" 
-                                       value="{{ item.quantity }}" 
-                                       min="1" 
-                                       max="{{ item.stock }}"
-                                       data-product-id="{{ item.product_id }}">
-                                <button class="qty-btn qty-increase" data-product-id="{{ item.product_id }}">+</button>
-                            </div>
-                            
-                            <button class="btn-remove" data-product-id="{{ item.product_id }}">
-                                Remove
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="cart-item-subtotal">
-                        <p class="subtotal-label">Subtotal:</p>
-                        <p class="subtotal-amount">₹<span class="item-subtotal">{{ "%.2f"|format(item.subtotal) }}</span></p>
-                    </div>
-                </div>
-                {% endfor %}
+  <div class="container">
+    <h1 class="page-title">Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="cart-layout">
+      <!-- Cart Items -->
+      <div class="cart-items-section">
+        {% for item in cart_items %}
+        <div class="cart-item" data-product-id="{{ item.product_id }}">
+          <div class="cart-item-image">
+            <img src="{{ item.image_url }}" alt="{{ item.name }}">
+          </div>
+
+          <div class="cart-item-details">
+            <h3 class="cart-item-name">{{ item.name }}</h3>
+            <p class="cart-item-price">₹{{ "%.2f"|format(item.price) }} each</p>
+
+            <div class="cart-item-actions">
+              <div class="quantity-controls">
+                <button class="qty-btn qty-decrease" data-product-id="{{ item.product_id }}">−</button>
+                <input type="number" class="qty-input" value="{{ item.quantity }}" min="1" max="{{ item.stock }}"
+                  data-product-id="{{ item.product_id }}">
+                <button class="qty-btn qty-increase" data-product-id="{{ item.product_id }}">+</button>
+              </div>
+
+              <button class="btn-remove" data-product-id="{{ item.product_id }}">
+                Remove
+              </button>
             </div>
-            
-            <!-- Cart Summary -->
-            <div class="cart-summary">
-                <div class="card">
-                    <div class="card__body">
-                        <h2>Order Summary</h2>
-                        
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span>₹<span id="cart-subtotal">{{ "%.2f"|format(total) }}</span></span>
-                        </div>
-                        
-                        <div class="summary-row">
-                            <span>Shipping:</span>
-                            <span>₹<span id="shipping-cost">0.00</span></span>
-                        </div>
-                        
-                        <div class="summary-row summary-row--total">
-                            <strong>Total:</strong>
-                            <strong>₹<span id="cart-total">{{ "%.2f"|format(total) }}</span></strong>
-                        </div>
-                        
-                        <button class="btn btn--primary btn--lg btn--full-width">
-                            Proceed to Checkout
-                        </button>
-                        
-                        <a href="{{ url_for('products') }}" class="continue-shopping">
-                            ← Continue Shopping
-                        </a>
-                    </div>
-                </div>
+          </div>
+
+          <div class="cart-item-subtotal">
+            <p class="subtotal-label">Subtotal:</p>
+            <p class="subtotal-amount">₹<span class="item-subtotal">{{ "%.2f"|format(item.subtotal) }}</span></p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary">
+        <div class="card">
+          <div class="card__body">
+            <h2>Order Summary</h2>
+
+            <div class="summary-row">
+              <span>Subtotal:</span>
+              <span>₹<span id="cart-subtotal">{{ "%.2f"|format(total) }}</span></span>
             </div>
+
+            <div class="summary-row">
+              <span>Shipping:</span>
+              <span>₹<span id="shipping-cost">0.00</span></span>
+            </div>
+
+            <div class="summary-row summary-row--total">
+              <strong>Total:</strong>
+              <strong>₹<span id="cart-total">{{ "%.2f"|format(total) }}</span></strong>
+            </div>
+
+            <a href="{{ url_for('checkout') }}" class="btn btn--primary btn--lg btn--full-width">
+              Proceed to Checkout
+            </a>
+
+            <a href="{{ url_for('products') }}" class="continue-shopping">
+              ← Continue Shopping
+            </a>
+          </div>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="9" cy="21" r="1"/>
-                <circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-            <h3>Your cart is empty</h3>
-            <p>Add some products to get started!</p>
-            <a href="{{ url_for('products') }}" class="btn btn--primary">Browse Products</a>
-        </div>
-        {% endif %}
+      </div>
     </div>
+    {% else %}
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="21" r="1" />
+        <circle cx="20" cy="21" r="1" />
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+      </svg>
+      <h3>Your cart is empty</h3>
+      <p>Add some products to get started!</p>
+      <a href="{{ url_for('products') }}" class="btn btn--primary">Browse Products</a>
+    </div>
+    {% endif %}
+  </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-// Cart update functionality
-document.querySelectorAll('.qty-decrease').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const productId = this.dataset.productId;
-        const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
-        if (input.value > 1) {
-            input.value = parseInt(input.value) - 1;
-            updateCartQuantity(productId, input.value);
-        }
+  // Cart update functionality
+  document.querySelectorAll('.qty-decrease').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const productId = this.dataset.productId;
+      const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+      if (input.value > 1) {
+        input.value = parseInt(input.value) - 1;
+        updateCartQuantity(productId, input.value);
+      }
     });
-});
+  });
 
-document.querySelectorAll('.qty-increase').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const productId = this.dataset.productId;
-        const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
-        if (parseInt(input.value) < parseInt(input.max)) {
-            input.value = parseInt(input.value) + 1;
-            updateCartQuantity(productId, input.value);
-        }
+  document.querySelectorAll('.qty-increase').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const productId = this.dataset.productId;
+      const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+      if (parseInt(input.value) < parseInt(input.max)) {
+        input.value = parseInt(input.value) + 1;
+        updateCartQuantity(productId, input.value);
+      }
     });
-});
+  });
 
-document.querySelectorAll('.qty-input').forEach(input => {
-    input.addEventListener('change', function() {
-        const productId = this.dataset.productId;
-        updateCartQuantity(productId, this.value);
+  document.querySelectorAll('.qty-input').forEach(input => {
+    input.addEventListener('change', function () {
+      const productId = this.dataset.productId;
+      updateCartQuantity(productId, this.value);
     });
-});
+  });
 
-document.querySelectorAll('.btn-remove').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const productId = this.dataset.productId;
-        removeFromCart(productId);
+  document.querySelectorAll('.btn-remove').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const productId = this.dataset.productId;
+      removeFromCart(productId);
     });
-});
+  });
 
-function updateCartQuantity(productId, quantity) {
+  function updateCartQuantity(productId, quantity) {
     fetch('/api/cart/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ product_id: productId, quantity: parseInt(quantity) })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+  }
+
+  function removeFromCart(productId) {
+    if (confirm('Remove this item from cart?')) {
+      fetch('/api/cart/remove', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ product_id: productId, quantity: parseInt(quantity) })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        }
-    });
-}
-
-function removeFromCart(productId) {
-    if (confirm('Remove this item from cart?')) {
-        fetch('/api/cart/remove', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ product_id: productId })
-        })
+        body: JSON.stringify({ product_id: productId })
+      })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                location.reload();
-            }
+          if (data.success) {
+            location.reload();
+          }
         });
     }
-}
+  }
 </script>
 {% endblock %}

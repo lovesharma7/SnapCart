@@ -6,30 +6,26 @@
 <section class="products-page">
     <div class="container">
         <h1 class="page-title">All Products</h1>
-        
+
         <!-- Filters -->
         <div class="filters-section">
             <form method="GET" action="{{ url_for('products') }}" class="filters-form">
                 <div class="form-group">
-                    <input type="text" 
-                           name="search" 
-                           class="form-control" 
-                           placeholder="Search products..."
-                           value="{{ search_query or '' }}">
+                    <input type="text" name="search" class="form-control" placeholder="Search products..."
+                        value="{{ search_query or '' }}">
                 </div>
-                
+
                 <div class="form-group">
                     <select name="category" class="form-control">
                         <option value="">All Categories</option>
                         {% for category in categories %}
-                        <option value="{{ category.id }}" 
-                                {% if selected_category == category.id %}selected{% endif %}>
+                        <option value="{{ category.id }}" {% if selected_category==category.id %}selected{% endif %}>
                             {{ category.name }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <button type="submit" class="btn btn--primary">Filter</button>
                 <a href="{{ url_for('products') }}" class="btn btn--secondary">Clear</a>
             </form>
@@ -40,7 +36,9 @@
         <div class="products-grid">
             {% for product in products %}
             <div class="product-card">
-                <a href="{{ url_for('product_detail', product_id=product.id) }}">
+
+                <!-- Product Image + General Info -->
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-link">
                     <div class="product-image">
                         <img src="{{ product.image_url }}" alt="{{ product.name }}">
                         {% if product.color %}
@@ -49,32 +47,61 @@
                         </span>
                         {% endif %}
                     </div>
+
                     <div class="product-info">
                         <span class="product-category">{{ product.category_name }}</span>
                         <h3 class="product-name">{{ product.name }}</h3>
                         <p class="product-description">{{ product.description[:60] }}...</p>
                         <p class="product-price">₹{{ "%.2f"|format(product.price) }}</p>
-                        {% if product.stock > 0 %}
-                            <span class="status status--success">In Stock ({{ product.stock }})</span>
-                        {% else %}
-                            <span class="status status--error">Out of Stock</span>
-                        {% endif %}
                     </div>
                 </a>
-                {% if is_logged_in and product.stock > 0 %}
-                <button class="btn btn--primary btn--full-width add-to-cart-btn" 
+
+                <!-- Stock + Wishlist Row -->
+                <div class="product-meta-row" style="padding: 0 16px 12px;">
+                    <div class="stock-wishlist-row"
+                        style="display:flex; align-items:center; justify-content:space-between;">
+
+                        {% if product.stock > 0 %}
+                        <span class="status status--success pill">
+                            In Stock ({{ product.stock }})
+                        </span>
+                        {% else %}
+                        <span class="status status--error pill">
+                            Out of Stock
+                        </span>
+                        {% endif %}
+
+                        {% if is_logged_in %}
+                        <button type="button" class="wishlist-heart" data-product-id="{{ product.id }}">
+                            🖤
+                        </button>
+                        {% else %}
+                        <a href="{{ url_for('auth') }}" class="pill" style="text-decoration:none;">
+                            Login to Wishlist
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Add to cart button -->
+                <div style="padding: 20 16px 16px;">
+                    {% if is_logged_in and product.stock > 0 %}
+                    <button type="button" class="btn btn--primary btn--full-width add-to-cart-btn"
                         data-product-id="{{ product.id }}">
-                    Add to Cart
-                </button>
-                {% endif %}
+                        Add to Cart
+                    </button>
+                    {% endif %}
+                </div>
+
             </div>
             {% endfor %}
         </div>
         {% else %}
         <div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
             </svg>
             <h3>No products found</h3>
             <p>Try adjusting your search or filters</p>
@@ -87,4 +114,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wishlist.js') }}"></script>
 {% endblock %}

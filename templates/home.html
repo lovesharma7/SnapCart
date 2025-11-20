@@ -3,21 +3,34 @@
 {% block title %}Home - SnapCart{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
 <section class="hero">
+
+    <!-- Background Image Slideshow -->
+    <div class="hero-slideshow">
+        <img src="{{ url_for('static', filename='images/slide1.png') }}" class="slide active">
+        <img src="{{ url_for('static', filename='images/slide2.png') }}" class="slide">
+        <img src="{{ url_for('static', filename='images/slide3.png') }}" class="slide">
+    </div>
+
+    <!-- Dark Overlay -->
+    <div class="hero-overlay"></div>
+
     <div class="container">
         <div class="hero-content">
             <h1>Welcome to SnapCart</h1>
             <p>Discover amazing products and create your perfect outfit with our Virtual Basket feature</p>
+
             <div class="hero-actions">
-                <a href="{{ url_for('products') }}" class="btn btn--primary btn--lg">Shop Now</a>
+                <a href="{{ url_for('products') }}" class="btn btn--outline btn--lg">Shop Now</a>
                 <a href="{{ url_for('virtual_basket') }}" class="btn btn--outline btn--lg">Try Virtual Basket</a>
+                <a href="{{ url_for('cart') }}" class="btn btn--outline btn--lg">View Cart</a>
             </div>
         </div>
     </div>
+
 </section>
 
-<!-- Categories Section -->
+
 <section class="categories-section">
     <div class="container">
         <h2 class="section-title">Shop by Category</h2>
@@ -55,7 +68,6 @@
     </div>
 </section>
 
-<!-- Featured Products Section -->
 <section class="featured-section">
     <div class="container">
         <h2 class="section-title">Featured Products</h2>
@@ -77,11 +89,16 @@
                         {% endif %}
                     </div>
                 </a>
-                {% if is_logged_in and product.stock > 0 %}
-                <button class="btn btn--primary btn--full-width add-to-cart-btn" 
-                        data-product-id="{{ product.id }}">
-                    Add to Cart
-                </button>
+                {% if product.stock > 0 %}
+                    <button class="btn btn--primary btn--full-width add-to-cart-btn" 
+                            data-product-id="{{ product.id }}"
+                            data-product-name="{{ product.name|e }}"
+                            data-product-price="{{ product.price }}"
+                            data-product-image="{{ product.image_url }}">
+                        Add to Cart
+                    </button>
+                {% else %}
+                    <button class="btn btn--full-width" disabled>Out of Stock</button>
                 {% endif %}
             </div>
             {% endfor %}
@@ -92,7 +109,6 @@
     </div>
 </section>
 
-<!-- Virtual Basket Feature Highlight -->
 <section class="feature-highlight">
     <div class="container">
         <div class="feature-content">

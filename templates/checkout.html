@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Checkout - ShopEase{% endblock %}
+
+{% block content %}
+<section class="cart-page">
+  <div class="container">
+    <h1 class="page-title">Checkout</h1>
+
+    <div class="cart-layout">
+      <div>
+        <div class="card">
+          <div class="card__body">
+            <h2>Shipping Details</h2>
+            <form method="POST" action="{{ url_for('create_order') }}">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input class="form-control" name="full_name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <input class="form-control" name="address" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input class="form-control" name="city" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pincode</label>
+                <input class="form-control" name="pincode" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input class="form-control" name="phone" required>
+              </div>
+              <button type="submit" class="btn btn--primary btn--lg">Create Order & Continue</button>
+              <a href="{{ url_for('cart') }}" class="btn btn--secondary" style="margin-left:8px;">Back to Cart</a>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-summary">
+        <div class="card">
+          <div class="card__body">
+            <h2>Order Summary</h2>
+            <div>
+              {% for item in cart_items %}
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span>{{ item.name }} × {{ item.quantity }}</span>
+                <span>₹{{ '%.2f'|format(item.price * item.quantity) }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="summary-row summary-row--total" style="margin-top:12px;">
+              <strong>Total:</strong>
+              <strong>₹{{ '%.2f'|format(total) }}</strong>
+            </div>
+            <p style="color:var(--color-text-secondary); font-size:12px; margin-top:8px;">
+              Taxes included. No shipping charges for demo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

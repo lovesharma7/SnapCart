@@ -77,6 +77,37 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
+-- Modify Orders table to add payment fields
+ALTER TABLE orders
+  ADD COLUMN payment_id INT NULL,
+  ADD COLUMN payment_status VARCHAR(20) DEFAULT 'unpaid';
+-- Payments table
+CREATE TABLE IF NOT EXISTS payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(10) DEFAULT 'INR',
+  status VARCHAR(20) NOT NULL DEFAULT 'created',   -- created|processing|success|failed|pending|refunded
+  method VARCHAR(30) DEFAULT NULL,                 -- card|upi|netbanking
+  provider_txn_id VARCHAR(64) DEFAULT NULL,        -- mock txn reference
+  meta_json JSON DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_payments_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  INDEX idx_payments_order (order_id),
+  INDEX idx_payments_status (status)
+);
+-- Payment events table
+CREATE TABLE IF NOT EXISTS payment_events (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  payment_id INT NOT NULL,
+  event_type VARCHAR(40) NOT NULL,
+  payload_json JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE
+);
+
+
 
 -- Insert Categories
 INSERT INTO categories (name, description) VALUES
@@ -147,3 +178,15 @@ INSERT INTO products (name, description, price, category_id, image_url, stock, c
 ('Sunglasses', 'Stylish UV protection sunglasses', 1299.00, 4, 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400', 90, 'black', NULL),
 ('Leather Wallet', 'Premium leather wallet', 1499.00, 4, 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=400', 100, 'brown', NULL),
 ('Backpack', 'Casual canvas backpack', 1999.00, 4, 'https://m.media-amazon.com/images/I/715vso7qFEL._SL1500_.jpg', 55, 'black', NULL);
+
+
+-- Wishlist table
+CREATE TABLE IF NOT EXISTS wishlists (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY user_product_unique (user_id, product_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);

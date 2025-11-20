@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Payment - ShopEase Secure{% endblock %}
+
+{% block content %}
+<section class="virtual-basket-page">
+  <div class="container" style="max-width:720px;">
+    <div class="card">
+      <div class="card__body">
+        <h1 style="margin-bottom:8px;">ShopEase Secure Payment (Demo)</h1>
+        <p style="color:var(--color-text-secondary); margin-bottom:16px;">
+          Order #{{ order.id }} • Paying ₹{{ '%.2f'|format(payment.amount) }} • INR
+        </p>
+
+        <form method="POST" action="{{ url_for('mock_gateway_process') }}">
+          <input type="hidden" name="payment_id" value="{{ payment.id }}">
+
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <div>
+              <label style="margin-right:12px;">
+                <input type="radio" name="method" value="card" checked> Card
+              </label>
+              <label style="margin-right:12px;">
+                <input type="radio" name="method" value="upi"> UPI
+              </label>
+              <label>
+                <input type="radio" name="method" value="netbanking"> Netbanking
+              </label>
+            </div>
+          </div>
+
+          <!-- Card fields -->
+          <div id="card-fields">
+            <div class="form-group">
+              <label class="form-label">Card Number</label>
+              <input
+                type="text"
+                class="form-control"
+                name="card_number"
+                placeholder="4111 1111 1111 1111"
+              >
+            </div>
+            <div style="display:flex; gap:12px;">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Expiry</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="expiry"
+                  placeholder="12/29"
+                >
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">CVV</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="cvv"
+                  placeholder="123"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI fields -->
+          <div id="upi-fields" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">UPI ID</label>
+              <input
+                type="text"
+                class="form-control"
+                name="upi_id"
+                placeholder="name@bank"
+              >
+            </div>
+          </div>
+
+          <!-- Netbanking fields -->
+          <div id="nb-fields" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Select Bank</label>
+              <select class="form-control" name="bank">
+                <option value="">-- Select Bank --</option>
+                <option value="SBI">SBI</option>
+                <option value="HDFC">HDFC</option>
+                <option value="ICICI">ICICI</option>
+                <option value="Axis">Axis</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Testing control: choose outcome -->
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label">Simulate Outcome</label>
+            <select class="form-control" name="outcome">
+              <option value="success">Success</option>
+              <option value="failed">Failed</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--lg btn--full-width" style="margin-top:12px;">
+            Pay ₹{{ '%.2f'|format(payment.amount) }}
+          </button>
+
+          <p style="margin-top:12px; color:var(--color-text-secondary); font-size:12px; text-align:center;">
+            Demo environment. No real charges.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const methodRadios = document.querySelectorAll('input[name="method"]');
+    const cardFields = document.getElementById('card-fields');
+    const upiFields = document.getElementById('upi-fields');
+    const nbFields = document.getElementById('nb-fields');
+    const form = document.querySelector('form');
+
+    // Toggle input groups when payment method changes
+    function updateMethodVisibility() {
+      const val = document.querySelector('input[name="method"]:checked').value;
+      cardFields.style.display = (val === 'card') ? '' : 'none';
+      upiFields.style.display = (val === 'upi') ? '' : 'none';
+      nbFields.style.display = (val === 'netbanking') ? '' : 'none';
+    }
+
+    methodRadios.forEach(r => {
+      r.addEventListener('change', updateMethodVisibility);
+    });
+
+    // Initial state
+    updateMethodVisibility();
+
+    // Basic front-end validation before submit
+    form.addEventListener('submit', function (e) {
+      const method = document.querySelector('input[name="method"]:checked').value;
+
+      if (method === 'card') {
+        const cardNumber = form.querySelector('input[name="card_number"]').value.trim();
+        const expiry = form.querySelector('input[name="expiry"]').value.trim();
+        const cvv = form.querySelector('input[name="cvv"]').value.trim();
+
+        if (!cardNumber || !expiry || !cvv) {
+          e.preventDefault();
+          alert('Please fill all card details (Card Number, Expiry, CVV).');
+          return;
+        }
+      } else if (method === 'upi') {
+        const upiId = form.querySelector('input[name="upi_id"]').value.trim();
+        if (!upiId) {
+          e.preventDefault();
+          alert('Please enter your UPI ID.');
+          return;
+        }
+      } else if (method === 'netbanking') {
+        const bank = form.querySelector('select[name="bank"]').value;
+        if (!bank) {
+          e.preventDefault();
+          alert('Please select a bank for Netbanking.');
+          return;
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

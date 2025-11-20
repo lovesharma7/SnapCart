@@ -1,60 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SnapCart{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Search Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 </head>
+
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-wrapper">
-                <a href="{{ url_for('home') }}" class="logo">SnapCart</a>
-                
+
+                <!-- LOGO TEXT -->
+                <a href="{{ url_for('home') }}" class="logo-text">
+                    <span class="logo-snap">Snap</span>
+                    <span class="logo-cart">Cart</span>
+                </a>
+
                 <div class="nav-links">
+
+                    <!-- SEARCH BAR FIRST (right after logo) -->
+                    <div class="nav-search">
+                        <input type="text" placeholder="Search..." class="search-input">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+
+                    <!-- HOME -->
                     <a href="{{ url_for('home') }}">Home</a>
+
+                    <!-- MENU LINKS -->
                     <a href="{{ url_for('products') }}">Products</a>
                     <a href="{{ url_for('virtual_basket') }}">Virtual Basket</a>
-                    
+
+                    <a href="{{ url_for('wishlist.list_wishlist') }}" class="cart-link">
+                        Wishlist <span id="wishlist-count-badge" class="cart-badge">0</span>
+                    </a>
+
                     {% if is_logged_in %}
-                        <a href="{{ url_for('cart') }}" class="cart-link">
-                            Cart <span class="cart-badge" id="cart-badge">0</span>
-                        </a>
-                        <a href="{{ url_for('logout') }}">Logout</a>
+                    <a href="{{ url_for('cart') }}" class="cart-link">
+                        Cart <span class="cart-badge" id="cart-badge">0</span>
+                    </a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
                     {% else %}
-                        <a href="{{ url_for('auth') }}" class="btn btn--primary">Login</a>
+                    <a href="{{ url_for('auth') }}" class="btn btn--primary">Login</a>
                     {% endif %}
+
+                    <!-- THEME SWITCH -->
+                    <label class="theme-slider-label" for="theme-toggle">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider-track">
+                            <span class="slider-scene" id="day-scene">
+                                <span class="cloud"></span>
+                                <span class="cloud small"></span>
+                            </span>
+                            <span class="slider-scene" id="night-scene">
+                                <span class="star"></span>
+                                <span class="star"></span>
+                                <span class="star"></span>
+                            </span>
+                            <span class="slider-scene" id="night-hill-container">
+                                <span class="hill"></span>
+                            </span>
+                        </span>
+                    </label>
+
                 </div>
+
             </div>
         </div>
     </nav>
 
-    <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                    <div class="alert alert--{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flash-messages">
+        <div class="container">
+            {% for category, message in messages %}
+            <div class="alert alert--{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
     <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 SnapCart</p>
         </div>
     </footer>
 
+
+    <!-- ⭐ Wishlist count auto-load -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/wishlist/count")
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById("wishlist-count-badge");
+                if (badge) {
+                    badge.textContent = data.count || 0;
+                    badge.style.display = (data.count > 0) ? "inline-block" : "none";
+                }
+            })
+            .catch(err => console.error("Wishlist count error:", err));
+    });
+    </script>
+
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/wishlist.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

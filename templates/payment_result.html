@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Payment Result - ShopEase{% endblock %}
+
+{% block content %}
+<section class="virtual-basket-page">
+  <div class="container" style="max-width:720px;">
+    <div class="card">
+      <div class="card__body">
+        <h1>Payment Status</h1>
+        <p style="color:var(--color-text-secondary);">
+          Order #{{ order.id }} • Payment #{{ payment.id }} • ₹{{ '%.2f'|format(payment.amount) }}
+        </p>
+
+        {% if payment.status == 'success' %}
+          <div class="status status--success" style="margin:12px 0;">Payment Successful</div>
+          <p>Your order has been confirmed. Thank you for shopping with ShopEase!</p>
+          <a href="{{ url_for('products') }}" class="btn btn--primary" style="margin-top:12px;">Continue Shopping</a>
+        {% elif payment.status == 'failed' %}
+          <div class="status status--error" style="margin:12px 0;">Payment Failed</div>
+          <p>Something went wrong. You can retry the payment.</p>
+          <form method="POST" action="{{ url_for('start_payment') }}" style="margin-top:12px;">
+            <input type="hidden" name="order_id" value="{{ order.id }}">
+            <button class="btn btn--primary">Retry Payment</button>
+          </form>
+        {% elif payment.status == 'pending' %}
+          <div class="status" style="margin:12px 0;">Payment Pending</div>
+          <p>Your payment is awaiting confirmation. Refresh this page after a few seconds, or we’ll notify you.</p>
+        {% else %}
+          <div class="status" style="margin:12px 0;">{{ payment.status|title }}</div>
+          <p>Current payment state is {{ payment.status }}.</p>
+        {% endif %}
+
+        <div style="margin-top:16px;">
+          <p style="font-size:12px; color:var(--color-text-secondary);">
+            Transaction Ref: {{ payment.provider_txn_id or 'N/A' }}
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

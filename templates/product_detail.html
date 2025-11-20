@@ -3,115 +3,127 @@
 {% block title %}{{ product.name }} - SnapCart{% endblock %}
 
 {% block content %}
+<style>
+    /* Button Styling Fixes for this page */
+    .btn--buy {
+        background-color: #000000 !important; /* Black Color */
+        color: white !important;
+        border: 1px solid #000000;
+        width: 100%;           /* Full Width */
+        display: block;
+        padding: 14px 0;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn--buy:hover {
+        background-color: #333333 !important; /* Dark Grey on Hover */
+        transform: translateY(-2px);
+    }
+
+    /* Container to stack buttons vertically */
+    .button-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 15px; /* Gap between buttons */
+        width: 100%;
+        margin-top: 20px;
+    }
+</style>
+
 <section class="product-detail-page">
-    <div class="container">
-        <a href="{{ url_for('products') }}" class="back-link">
-            ← Back to Products
-        </a>
-        
-        <div class="product-detail-grid">
-            <!-- Product Image -->
-            <div class="product-image-large">
-                <img src="{{ product.image_url }}" alt="{{ product.name }}">
-            </div>
-            
-            <!-- Product Info -->
-            <div class="product-detail-info">
-                <span class="product-category">{{ product.category_name }}</span>
-                <h1 class="product-title">{{ product.name }}</h1>
-                
-                <div class="product-meta">
-                    {% if product.color %}
-                    <div class="meta-item">
-                        <strong>Color:</strong> 
-                        <span class="color-badge color-badge--{{ product.color|lower }}">
-                            {{ product.color|title }}
-                        </span>
-                    </div>
-                    {% endif %}
-                    {% if product.size %}
-                    <div class="meta-item">
-                        <strong>Size:</strong> {{ product.size }}
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <p class="product-description-full">{{ product.description }}</p>
-                
-                <div class="product-price-section">
-                    <span class="product-price-large">₹{{ "%.2f"|format(product.price) }}</span>
-                </div>
-                
-                <div class="product-stock">
-                    {% if product.stock > 0 %}
-                        <span class="status status--success">✓ In Stock ({{ product.stock }} available)</span>
-                    {% else %}
-                        <span class="status status--error">✗ Out of Stock</span>
-                    {% endif %}
-                </div>
-                
-                <!-- Add to Cart Section -->
-                {% if is_logged_in %}
-                    {% if product.stock > 0 %}
-                    <div class="product-actions">
-                        <div class="quantity-selector">
-                            <label for="quantity">Quantity:</label>
-                            <input type="number" 
-                                   id="quantity" 
-                                   value="1" 
-                                   min="1" 
-                                   max="{{ product.stock }}" 
-                                   class="form-control">
-                        </div>
-                        <button class="btn btn--primary btn--lg add-to-cart-detail-btn" 
-                                data-product-id="{{ product.id }}">
-                            Add to Cart
-                        </button>
-                    </div>
-                    {% endif %}
-                {% else %}
-                <div class="login-prompt">
-                    <p>Please <a href="{{ url_for('auth') }}">login</a> to add items to cart</p>
-                </div>
-                {% endif %}
-            </div>
+  <div class="container">
+    <a href="{{ url_for('products') }}" class="back-link">← Back to products</a>
+
+    <div class="product-detail-grid">
+
+      <div class="product-image-large">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      </div>
+
+      <div class="product-detail-info">
+
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <div class="product-meta">
+          <div class="meta-item">Category: {{ product.category_name }}</div>
+          <div class="meta-item">Price: ₹{{ "%.2f"|format(product.price) }}</div>
         </div>
-        
-        <!-- Related Products -->
-        {% if related_products %}
-        <section class="related-products">
-            <h2 class="section-title">You May Also Like</h2>
-            <div class="products-grid">
-                {% for related in related_products %}
-                <div class="product-card">
-                    <a href="{{ url_for('product_detail', product_id=related.id) }}">
-                        <div class="product-image">
-                            <img src="{{ related.image_url }}" alt="{{ related.name }}">
-                        </div>
-                        <div class="product-info">
-                            <span class="product-category">{{ related.category_name }}</span>
-                            <h3 class="product-name">{{ related.name }}</h3>
-                            <p class="product-price">₹{{ "%.2f"|format(related.price) }}</p>
-                        </div>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
+
+        <p class="product-description-full">
+          {{ product.description }}
+        </p>
+
+        <div class="detail-stock-row">
+          {% if product.stock > 0 %}
+          <span class="status status--success pill">In Stock ({{ product.stock }})</span>
+          {% else %}
+          <span class="status status--error pill">Out of Stock</span>
+          {% endif %}
+        </div>
+
+        <div class="detail-buttons button-stack">
+
+          <button class="btn--buy" onclick="buyNow('{{ product.id }}')">
+            Buy Now
+          </button>
+
+          {% if is_logged_in and product.stock > 0 %}
+          <button class="btn--buy add-to-cart-btn" data-product-id="{{ product.id }}">
+            Add to Cart
+          </button>
+          {% endif %}
+
+        </div>
+
+      </div>
     </div>
+  </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+
 <script>
-// Handle quantity-based add to cart
-document.querySelector('.add-to-cart-detail-btn')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    const productId = this.dataset.productId;
-    const quantity = parseInt(document.getElementById('quantity').value);
-    addToCart(productId, quantity);
-});
+  function buyNow(productId) {
+    console.log("Buy Now clicked for Product ID:", productId);
+
+    fetch('/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        product_id: productId,
+        quantity: 1
+      })
+    })
+      .then(response => {
+        if (response.status === 401) {
+          window.location.href = "{{ url_for('login') }}";
+          return null;
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!data) return;
+
+        if (data.success || data.message === 'Added to cart') {
+          // Redirect to checkout immediately
+          window.location.href = "{{ url_for('checkout') }}";
+        } else {
+          alert('Error: ' + (data.error || 'Could not add to cart'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Check console for details.');
+      });
+  }
 </script>
 {% endblock %}
