@@ -1,1 +1,2 @@
 # SnapCart
+Your Virtual Basket
